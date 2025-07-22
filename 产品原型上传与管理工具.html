@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品原型上传与管理工具 (Firebase版)</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Lucide Icons图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .prototype-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+        }
+        /* 添加加载动画 */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">产品原型管理后台</h1>
+            <p class="mt-2 text-md text-gray-500">在这里添加、查看和管理您的所有创意原型 (数据实时云同步)。</p>
+            <div id="auth-status" class="mt-2 text-xs text-gray-400">正在连接...</div>
+        </header>
+
+        <!-- 上传表单区域 -->
+        <div id="upload-section" class="bg-white p-8 rounded-xl shadow-lg mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <i data-lucide="plus-circle" class="w-6 h-6 mr-3 text-indigo-500"></i>
+                添加一个新的产品原型
+            </h2>
+            <form id="prototype-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 表单内容与之前相同 -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="proto-version" class="block text-sm font-medium text-gray-700">原型版本号</label>
+                        <input type="text" id="proto-version" placeholder="例如：1.0 版本 A" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="proto-name" class="block text-sm font-medium text-gray-700">产品名称</label>
+                        <input type="text" id="proto-name" placeholder="例如：“安心拍”" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="proto-desc" class="block text-sm font-medium text-gray-700">产品一句话描述</label>
+                        <input type="text" id="proto-desc" placeholder="例如：AI场景隐私保护与智能创作引导器" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                     <div>
+                        <label for="proto-features" class="block text-sm font-medium text-gray-700">核心功能 (每行一个)</label>
+                        <textarea id="proto-features" rows="4" placeholder="AI隐私滤镜/模糊&#10;“场景助手”模式&#10;情绪识别与引导" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label for="proto-users" class="block text-sm font-medium text-gray-700">目标用户</label>
+                        <textarea id="proto-users" rows="2" placeholder="初级视频创作者、注重隐私的普通用户..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <label for="proto-highlight" class="block text-sm font-medium text-gray-700">差异化亮点</label>
+                        <textarea id="proto-highlight" rows="2" placeholder="专注拍摄过程中的“心理安全感”与“专业度提升”..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <label for="proto-logic" class="block text-sm font-medium text-gray-700">初步商业逻辑</label>
+                        <input type="text" id="proto-logic" placeholder="提升体验，降低创作门槛..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="proto-monetization" class="block text-sm font-medium text-gray-700">潜在变现模式</label>
+                        <input type="text" id="proto-monetization" placeholder="订阅服务、素材市场、品牌合作..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+                <div class="md:col-span-2 flex justify-end">
+                    <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        保存原型
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 原型展示区域 -->
+        <div id="prototypes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="loader-container"><div class="loader"></div></div>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div id="delete-modal" class="modal-backdrop">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
+            <h3 class="text-lg font-bold text-gray-900">确认删除</h3>
+            <p class="mt-2 text-sm text-gray-600">您确定要永久删除这个原型吗？此操作无法撤销。</p>
+            <div class="mt-4 flex justify-end space-x-3">
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">取消</button>
+                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // 导入Firebase模块
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+// Firebase配置 (替换成你自己的)
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDoBqHdy2mtrV59l440R5_cy6hNhIHh69E",
+  authDomain: "awesome-share-idea.firebaseapp.com",
+  projectId: "awesome-share-idea",
+  storageBucket: "awesome-share-idea.firebasestorage.app",
+  messagingSenderId: "948762728944",
+  appId: "1:948762728944:web:75ee9632d3991606066535"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+        
+        // 初始化Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 获取页面元素
+        const form = document.getElementById('prototype-form');
+        const prototypesList = document.getElementById('prototypes-list');
+        const deleteModal = document.getElementById('delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+        const authStatus = document.getElementById('auth-status');
+        const loader = document.getElementById('loader-container');
+        
+        let prototypeToDeleteId = null;
+        let prototypesCollectionRef;
+
+        // 监听认证状态变化
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                // 用户已登录
+                authStatus.textContent = `已连接 | 用户ID: ${user.uid}`;
+                prototypesCollectionRef = collection(db, 'artifacts', appId, 'users', user.uid, 'prototypes');
+                listenForPrototypes();
+            } else {
+                // 用户未登录
+                authStatus.textContent = '未连接，正在尝试匿名登录...';
+            }
+        });
+
+        // 登录函数
+        async function signIn() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Authentication failed:", error);
+                authStatus.textContent = `连接失败: ${error.message}`;
+            }
+        }
+
+        // 监听原型数据
+        const listenForPrototypes = () => {
+            const q = query(prototypesCollectionRef, orderBy('createdAt', 'desc')); // 按创建时间降序排序
+
+            onSnapshot(q, (snapshot) => {
+                loader.style.display = 'none'; // 隐藏加载动画
+                prototypesList.innerHTML = ''; // 清空现有列表
+                if (snapshot.empty) {
+                    prototypesList.innerHTML = `<p class="col-span-full text-center text-gray-500">还没有原型，快添加一个吧！</p>`;
+                }
+                snapshot.forEach(doc => {
+                    const proto = doc.data();
+                    const card = createPrototypeCard(proto, doc.id);
+                    prototypesList.appendChild(card);
+                });
+                lucide.createIcons(); // 重新渲染所有图标
+            }, (error) => {
+                console.error("Error fetching prototypes:", error);
+                prototypesList.innerHTML = `<p class="col-span-full text-center text-red-500">加载数据失败，请检查控制台信息。</p>`;
+            });
+        };
+        
+        // 创建原型卡片的函数
+        const createPrototypeCard = (proto, id) => {
+            const card = document.createElement('div');
+            card.className = 'prototype-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out border border-gray-200';
+            const featuresHtml = (proto.features || '').split('\n').map(line => 
+                line.trim() ? `<li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span>${line.trim()}</span></li>` : ''
+            ).join('');
+
+            card.innerHTML = `
+                <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white relative">
+                    <button class="delete-btn absolute top-4 right-4 text-white/70 hover:text-white" data-id="${id}">
+                        <i data-lucide="trash-2" class="w-5 h-5 pointer-events-none"></i>
+                    </button>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold bg-white/20 text-white py-1 px-2 rounded-full">${proto.version || 'N/A'}</span>
+                        <i data-lucide="shield-check" class="w-6 h-6 opacity-80"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-3">${proto.name}</h2>
+                    <p class="text-sm opacity-90 mt-1">${proto.desc}</p>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3"><i data-lucide="zap" class="w-5 h-5 mr-2 text-indigo-500"></i>核心功能</h3>
+                        <ul class="list-none space-y-2 text-gray-600 text-sm pl-1">${featuresHtml}</ul>
+                    </div>
+                    <hr class="border-gray-200">
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3"><i data-lucide="users" class="w-5 h-5 mr-2 text-indigo-500"></i>目标用户</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">${proto.users}</p>
+                    </div>
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3"><i data-lucide="sparkles" class="w-5 h-5 mr-2 text-indigo-500"></i>差异化亮点</h3>
+                        <p class="text-gray-600 text-sm bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-500">${proto.highlight}</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2"><i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-indigo-500"></i>商业逻辑</h4>
+                            <p class="text-xs text-gray-500">${proto.logic}</p>
+                        </div>
+                        <div>
+                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2"><i data-lucide="dollar-sign" class="w-4 h-4 mr-1.5 text-indigo-500"></i>变现模式</h4>
+                            <p class="text-xs text-gray-500">${proto.monetization}</p>
+                        </div>
+                    </div>
+                </div>`;
+            return card;
+        };
+
+        // 表单提交事件
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!auth.currentUser) {
+                alert("用户未登录，无法保存！");
+                return;
+            }
+            
+            const newPrototype = {
+                version: document.getElementById('proto-version').value,
+                name: document.getElementById('proto-name').value,
+                desc: document.getElementById('proto-desc').value,
+                features: document.getElementById('proto-features').value,
+                users: document.getElementById('proto-users').value,
+                highlight: document.getElementById('proto-highlight').value,
+                logic: document.getElementById('proto-logic').value,
+                monetization: document.getElementById('proto-monetization').value,
+                createdAt: serverTimestamp() // 添加服务器时间戳，用于排序
+            };
+            
+            try {
+                await addDoc(prototypesCollectionRef, newPrototype);
+                form.reset();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("保存失败，请查看控制台错误信息。");
+            }
+        });
+
+        // 删除按钮的事件委托
+        prototypesList.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-btn')) {
+                prototypeToDeleteId = e.target.closest('.delete-btn').dataset.id;
+                deleteModal.style.display = 'flex';
+            }
+        });
+
+        // 确认删除
+        confirmDeleteBtn.addEventListener('click', async () => {
+            if (prototypeToDeleteId) {
+                try {
+                    await deleteDoc(doc(db, prototypesCollectionRef.path, prototypeToDeleteId));
+                } catch (error) {
+                    console.error("Error deleting document: ", error);
+                    alert("删除失败！");
+                } finally {
+                    prototypeToDeleteId = null;
+                    deleteModal.style.display = 'none';
+                }
+            }
+        });
+
+        cancelDeleteBtn.addEventListener('click', () => {
+            prototypeToDeleteId = null;
+            deleteModal.style.display = 'none';
+        });
+        
+        // 启动应用
+        signIn();
+
+    </script>
+</body>
+</html>
