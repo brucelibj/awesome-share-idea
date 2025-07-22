@@ -139,15 +139,23 @@
 
         // Firebase配置 (由运行环境自动提供)
 // Firebase配置 (替换成你自己的)
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSy...", // 粘贴你自己的apiKey
-  authDomain: "your-project-id.firebaseapp.com", // 粘贴你自己的authDomain
-  projectId: "your-project-id", // 粘贴你自己的projectId
-  storageBucket: "your-project-id.appspot.com", // 粘贴你自己的storageBucket
-  messagingSenderId: "...", // 粘贴你自己的messagingSenderId
-  appId: "1:..." // 粘贴你自己的appId
+  apiKey: "AIzaSyDoBqHdy2mtrV59l440R5_cy6hNhIHh69E",
+  authDomain: "awesome-share-idea.firebaseapp.com",
+  projectId: "awesome-share-idea",
+  storageBucket: "awesome-share-idea.firebasestorage.app",
+  messagingSenderId: "948762728944",
+  appId: "1:948762728944:web:75ee9632d3991606066535"
 };
-const appId = firebaseConfig.projectId; // 直接使用你的项目ID
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
         
         // 初始化Firebase
         const app = initializeApp(firebaseConfig);
