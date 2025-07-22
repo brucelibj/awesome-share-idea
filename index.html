@@ -1,48 +1,145 @@
-🚀 产品原型创意库
-这是一个超过200个创新想法的起点。
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品原型合集</title>
+    <!-- 引入Tailwind CSS，用于快速构建现代化界面 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Lucide Icons图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 使用更适合阅读的Inter字体 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* 使用柔和的浅灰色背景，突出卡片 */
+        }
+        /* 卡片悬浮时的动效，增加交互感 */
+        .prototype-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
 
-卡片 1: “安心拍”
-<table width="100%">
-<thead>
-<tr>
-<th align="left">🛡️ “安心拍”——AI场景隐私保护与智能创作引导器</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<p><strong>原型版本:</strong> 1.0 版本 A</p>
-<hr>
-<p><strong>🧩 核心功能:</strong></p>
-<ul>
-<li><strong>AI隐私滤镜/模糊：</strong>实时保护人脸、车牌等敏感信息。</li>
-<li><strong>“场景助手”模式：</strong>AI实时提供拍摄角度、运镜、构图建议。</li>
-<li><strong>情绪识别与引导：</strong>检测紧张情绪并提供放松建议。</li>
-</ul>
-<hr>
-<p><strong>🎯 目标用户:</strong></p>
-<p>初级视频创作者、希望分享生活但又注重隐私和个人形象的普通用户（如宝妈、学生、职场新人、探店博主、Vlog爱好者等）。</p>
-<hr>
-<p><strong>✨ 差异化亮点:</strong></p>
-<blockquote>
-<p>专注于拍摄过程中的“心理安全感”和“专业度提升”，通过AI技术从源头解决“怕人看见”的痛点，并提供非侵入式的创作辅助，区别于纯剪辑工具和纯社交平台。</p>
-</blockquote>
-<hr>
-<table>
-<tr>
-<td width="50%">
-<p><strong>💡 初步商业逻辑:</strong></p>
-<p>提升用户创作体验，降低创作门槛，使其更愿意持续产出。</p>
-</td>
-<td width="50%">
-<p><strong>💰 潜在变现模式:</strong></p>
-<p>订阅服务、素材/模板市场、品牌合作。</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
+    <div class="max-w-7xl mx-auto">
+        <!-- 页面主标题 -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">产品原型创意库</h1>
+            <p class="mt-2 text-md text-gray-500">超过200个创新想法的起点</p>
+        </header>
 
-<!-- 在这里复制上面的表格来添加更多卡片 -->
+        <!-- 原型卡片网格布局容器 -->
+        <!-- 响应式设计：手机上1列，平板2列，桌面3列 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <!-- 卡片 1: “安心拍” -->
+            <div class="prototype-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out border border-gray-200">
+                <!-- 卡片头部 -->
+                <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold bg-white/20 text-white py-1 px-2 rounded-full">原型 1.0 版本 A</span>
+                        <i data-lucide="shield-check" class="w-6 h-6 opacity-80"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-3">“安心拍”</h2>
+                    <p class="text-sm opacity-90 mt-1">AI场景隐私保护与智能创作引导器</p>
+                </div>
+
+                <!-- 卡片主体内容 -->
+                <div class="p-6 space-y-6">
+                    <!-- 核心功能 -->
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                            <i data-lucide="zap" class="w-5 h-5 mr-2 text-indigo-500"></i>
+                            核心功能
+                        </h3>
+                        <ul class="list-none space-y-2 text-gray-600 text-sm pl-1">
+                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">AI隐私滤镜/模糊：</strong>实时保护人脸、车牌等敏感信息。</span></li>
+                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">“场景助手”模式：</strong>AI实时提供拍摄角度、运镜、构图建议。</span></li>
+                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">情绪识别与引导：</strong>检测紧张情绪并提供放松建议。</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- 分隔线 -->
+                    <hr class="border-gray-200">
+
+                    <!-- 目标用户 -->
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                            <i data-lucide="users" class="w-5 h-5 mr-2 text-indigo-500"></i>
+                            目标用户
+                        </h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">初级视频创作者、注重隐私的普通用户（如宝妈、学生、探店博主等）。</p>
+                    </div>
+                    
+                    <!-- 差异化亮点 -->
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                            <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-indigo-500"></i>
+                            差异化亮点
+                        </h3>
+                        <p class="text-gray-600 text-sm bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-500">专注拍摄过程中的“心理安全感”与“专业度提升”，从源头解决痛点。</p>
+                    </div>
+
+                    <!-- 商业逻辑与变现 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2">
+                                <i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-indigo-500"></i>
+                                初步商业逻辑
+                            </h4>
+                            <p class="text-xs text-gray-500">提升体验，降低创作门槛，激励用户持续产出。</p>
+                        </div>
+                        <div>
+                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2">
+                                <i data-lucide="dollar-sign" class="w-4 h-4 mr-1.5 text-indigo-500"></i>
+                                潜在变现模式
+                            </h4>
+                            <p class="text-xs text-gray-500">订阅服务、素材/模板市场、品牌合作。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片 2: 示例占位符 -->
+            <div class="prototype-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out border border-gray-200">
+                 <div class="p-6 bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold bg-white/20 text-white py-1 px-2 rounded-full">原型 1.0 版本 B</span>
+                        <i data-lucide="briefcase" class="w-6 h-6 opacity-80"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-3">下一个伟大的产品</h2>
+                    <p class="text-sm opacity-90 mt-1">产品副标题或一句话描述</p>
+                </div>
+                <div class="p-6 text-gray-400 italic">
+                    <p>在这里填充下一个产品原型的详细信息...</p>
+                    <p class="mt-4">只需复制粘贴上面的卡片结构，然后替换为您的新内容即可。</p>
+                </div>
+            </div>
+
+            <!-- 卡片 3: 示例占位符 -->
+             <div class="prototype-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out border border-gray-200">
+                 <div class="p-6 bg-gradient-to-r from-purple-500 to-pink-600 text-white">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold bg-white/20 text-white py-1 px-2 rounded-full">原型 2.0 版本 C</span>
+                        <i data-lucide="rocket" class="w-6 h-6 opacity-80"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-3">改变世界的产品</h2>
+                    <p class="text-sm opacity-90 mt-1">产品副标题或一句话描述</p>
+                </div>
+                 <div class="p-6 text-gray-400 italic">
+                    <p>您的第3个，第4个，... 直到第200个产品原型都可以在这里展示。</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 脚本用于在页面加载后渲染所有Lucide图标
+        lucide.createIcons();
+    </script>
+</body>
+</html>
