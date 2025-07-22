@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品原型上传与管理工具 (分类折叠版)</title>
+    <title>产品原型管理工具 (卡片版)</title>
     <!-- 引入Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入Lucide Icons图标库 -->
@@ -14,23 +14,10 @@
             font-family: 'Inter', sans-serif;
             background-color: #f0f2f5;
         }
-        /* <details> 标签的箭头样式 */
-        summary {
-            cursor: pointer;
-            list-style: none; /* 移除默认箭头 */
-        }
-        summary::-webkit-details-marker {
-            display: none;
-        }
-        /* 自定义箭头 */
-        summary::before {
-            content: '►';
-            margin-right: 0.5rem;
-            display: inline-block;
-            transition: transform 0.2s;
-        }
-        details[open] > summary::before {
-            transform: rotate(90deg);
+        /* 卡片悬浮时的动效 */
+        .prototype-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         /* 简单的模态框样式 */
         .modal-backdrop {
@@ -55,7 +42,7 @@
 
     <div class="max-w-7xl mx-auto">
         <header class="text-center mb-10">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">产品原型管理后台</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">产品原型创意库</h1>
             <p class="mt-2 text-md text-gray-500">在这里添加、查看和管理您的所有创意原型 (数据实时云同步)。</p>
             <div id="auth-status" class="mt-2 text-xs text-gray-400">正在连接...</div>
         </header>
@@ -69,8 +56,8 @@
             <form id="prototype-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
                     <div>
-                        <label for="proto-category" class="block text-sm font-medium text-gray-700">产品类别</label>
-                        <input type="text" id="proto-category" placeholder="例如：AI工具 或 生活服务" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                        <label for="proto-version" class="block text-sm font-medium text-gray-700">原型版本号</label>
+                        <input type="text" id="proto-version" placeholder="例如：1.0 版本 A" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
                     <div>
                         <label for="proto-name" class="block text-sm font-medium text-gray-700">产品名称</label>
@@ -81,15 +68,11 @@
                         <input type="text" id="proto-desc" placeholder="例如：AI场景隐私保护与智能创作引导器" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
                      <div>
-                        <label for="proto-version" class="block text-sm font-medium text-gray-700">原型版本号</label>
-                        <input type="text" id="proto-version" placeholder="例如：1.0 版本 A" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <label for="proto-features" class="block text-sm font-medium text-gray-700">核心功能 (每行一个)</label>
+                        <textarea id="proto-features" rows="4" placeholder="AI隐私滤镜/模糊&#10;“场景助手”模式&#10;情绪识别与引导" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                     </div>
                 </div>
                 <div class="space-y-4">
-                    <div>
-                        <label for="proto-features" class="block text-sm font-medium text-gray-700">核心功能 (每行一个)</label>
-                        <textarea id="proto-features" rows="3" placeholder="AI隐私滤镜/模糊&#10;“场景助手”模式&#10;情绪识别与引导" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                    </div>
                     <div>
                         <label for="proto-users" class="block text-sm font-medium text-gray-700">目标用户</label>
                         <textarea id="proto-users" rows="2" placeholder="初级视频创作者、注重隐私的普通用户..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
@@ -97,6 +80,14 @@
                     <div>
                         <label for="proto-highlight" class="block text-sm font-medium text-gray-700">差异化亮点</label>
                         <textarea id="proto-highlight" rows="2" placeholder="专注拍摄过程中的“心理安全感”与“专业度提升”..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <label for="proto-logic" class="block text-sm font-medium text-gray-700">初步商业逻辑</label>
+                        <input type="text" id="proto-logic" placeholder="提升体验，降低创作门槛..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="proto-monetization" class="block text-sm font-medium text-gray-700">潜在变现模式</label>
+                        <input type="text" id="proto-monetization" placeholder="订阅服务、素材市场、品牌合作..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
                 </div>
                 <div class="md:col-span-2 flex justify-end">
@@ -107,9 +98,9 @@
             </form>
         </div>
 
-        <!-- 原型展示区域 -->
-        <div id="prototypes-list" class="space-y-4">
-            <div id="loader-container"><div class="loader"></div></div>
+        <!-- 原型展示区域 (网格布局) -->
+        <div id="prototypes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="loader-container" class="col-span-full"><div class="loader"></div></div>
         </div>
     </div>
 
@@ -128,7 +119,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration
@@ -169,9 +160,7 @@
 
         async function signIn() {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else { await signInAnonymously(auth); }
+                await signInAnonymously(auth);
             } catch (error) {
                 console.error("Authentication failed:", error);
                 authStatus.textContent = `连接失败: ${error.message}`;
@@ -185,25 +174,16 @@
                 loader.style.display = 'none';
                 prototypesList.innerHTML = '';
                 
-                const groupedPrototypes = {};
-                snapshot.forEach(doc => {
-                    const proto = doc.data();
-                    const category = proto.category || '未分类';
-                    if (!groupedPrototypes[category]) {
-                        groupedPrototypes[category] = [];
-                    }
-                    groupedPrototypes[category].push({ id: doc.id, ...proto });
-                });
-
-                if (Object.keys(groupedPrototypes).length === 0) {
+                if (snapshot.empty) {
                     prototypesList.innerHTML = `<p class="col-span-full text-center text-gray-500">还没有原型，快添加一个吧！</p>`;
                     return;
                 }
 
-                for (const category in groupedPrototypes) {
-                    const categoryElement = createCategoryElement(category, groupedPrototypes[category]);
-                    prototypesList.appendChild(categoryElement);
-                }
+                snapshot.forEach(doc => {
+                    const proto = doc.data();
+                    const card = createPrototypeCard(proto, doc.id);
+                    prototypesList.appendChild(card);
+                });
                 lucide.createIcons();
             }, (error) => {
                 console.error("Error fetching prototypes:", error);
@@ -211,40 +191,54 @@
             });
         };
         
-        const createCategoryElement = (category, items) => {
-            const details = document.createElement('details');
-            details.className = 'bg-white rounded-lg shadow p-4';
-            details.open = true; // 默认展开
-
-            const summary = document.createElement('summary');
-            summary.className = 'text-xl font-bold text-gray-800';
-            summary.textContent = category;
+        const createPrototypeCard = (proto, id) => {
+            const card = document.createElement('div');
+            card.className = 'prototype-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out border border-gray-200 flex flex-col';
             
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'mt-4 space-y-3 pl-6 border-l-2 border-gray-200 ml-1';
+            const featuresHtml = (proto.features || '').split('\n').map(line => 
+                line.trim() ? `<li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span>${line.trim()}</span></li>` : ''
+            ).join('');
 
-            items.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'relative group';
-                
-                const featuresHtml = (item.features || '').split('\n').map(line => 
-                    line.trim() ? `<li class="text-xs text-gray-500">${line.trim()}</li>` : ''
-                ).join('');
-
-                itemElement.innerHTML = `
-                    <h4 class="font-semibold text-gray-700">${item.name} <span class="text-xs font-normal text-gray-400 ml-2">${item.version || ''}</span></h4>
-                    <p class="text-sm text-gray-600 mt-1">${item.desc}</p>
-                    <ul class="mt-2 list-disc list-inside">${featuresHtml}</ul>
-                    <button class="delete-btn absolute top-0 right-0 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" data-id="${item.id}">
-                        <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
+            card.innerHTML = `
+                <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white relative">
+                    <button class="delete-btn absolute top-4 right-4 text-white/70 hover:text-white" data-id="${id}">
+                        <i data-lucide="trash-2" class="w-5 h-5 pointer-events-none"></i>
                     </button>
-                `;
-                contentDiv.appendChild(itemElement);
-            });
-
-            details.appendChild(summary);
-            details.appendChild(contentDiv);
-            return details;
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold bg-white/20 text-white py-1 px-2 rounded-full">${proto.version || 'N/A'}</span>
+                        <i data-lucide="shield-check" class="w-6 h-6 opacity-80"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-3">${proto.name}</h2>
+                    <p class="text-sm opacity-90 mt-1">${proto.desc}</p>
+                </div>
+                <div class="p-6 space-y-6 flex-grow flex flex-col">
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3"><i data-lucide="zap" class="w-5 h-5 mr-2 text-indigo-500"></i>核心功能</h3>
+                        <ul class="list-none space-y-2 text-gray-600 text-sm pl-1">${featuresHtml}</ul>
+                    </div>
+                    <hr class="border-gray-200">
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3"><i data-lucide="users" class="w-5 h-5 mr-2 text-indigo-500"></i>目标用户</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">${proto.users}</p>
+                    </div>
+                    <div class="flex-grow"></div>
+                    <div>
+                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3"><i data-lucide="sparkles" class="w-5 h-5 mr-2 text-indigo-500"></i>差异化亮点</h3>
+                        <p class="text-gray-600 text-sm bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-500">${proto.highlight}</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2"><i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-indigo-500"></i>商业逻辑</h4>
+                            <p class="text-xs text-gray-500">${proto.logic}</p>
+                        </div>
+                        <div>
+                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2"><i data-lucide="dollar-sign" class="w-4 h-4 mr-1.5 text-indigo-500"></i>变现模式</h4>
+                            <p class="text-xs text-gray-500">${proto.monetization}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return card;
         };
 
         form.addEventListener('submit', async (e) => {
@@ -252,13 +246,14 @@
             if (!auth.currentUser) { alert("用户未登录，无法保存！"); return; }
             
             const newPrototype = {
-                category: document.getElementById('proto-category').value.trim(),
                 version: document.getElementById('proto-version').value,
                 name: document.getElementById('proto-name').value,
                 desc: document.getElementById('proto-desc').value,
                 features: document.getElementById('proto-features').value,
                 users: document.getElementById('proto-users').value,
                 highlight: document.getElementById('proto-highlight').value,
+                logic: document.getElementById('proto-logic').value,
+                monetization: document.getElementById('proto-monetization').value,
                 createdAt: serverTimestamp()
             };
             
