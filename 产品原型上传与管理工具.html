@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品原型上传与管理工具 (Firebase版)</title>
-    <!-- 引入Tailwind CSS -->
+    <title>产品原型上传与管理工具</title>
+    <!-- 引入Tailwind CSS，用于快速构建现代化界面 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入Lucide Icons图标库 -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        /* 使用更适合阅读的Inter字体 */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f2f5;
         }
+        /* 卡片悬浮时的动效，增加交互感 */
         .prototype-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        /* 简单的模态框样式 */
         .modal-backdrop {
             display: none;
             position: fixed;
@@ -54,6 +57,7 @@
 <body class="p-4 sm:p-6 md:p-8">
 
     <div class="max-w-7xl mx-auto">
+        <!-- 页面主标题 -->
         <header class="text-center mb-10">
             <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">产品原型管理后台</h1>
             <p class="mt-2 text-md text-gray-500">在这里添加、查看和管理您的所有创意原型 (数据实时云同步)。</p>
@@ -67,7 +71,7 @@
                 添加一个新的产品原型
             </h2>
             <form id="prototype-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- 表单内容与之前相同 -->
+                <!-- 左侧表单 -->
                 <div class="space-y-4">
                     <div>
                         <label for="proto-version" class="block text-sm font-medium text-gray-700">原型版本号</label>
@@ -86,6 +90,7 @@
                         <textarea id="proto-features" rows="4" placeholder="AI隐私滤镜/模糊&#10;“场景助手”模式&#10;情绪识别与引导" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                     </div>
                 </div>
+                <!-- 右侧表单 -->
                 <div class="space-y-4">
                     <div>
                         <label for="proto-users" class="block text-sm font-medium text-gray-700">目标用户</label>
@@ -104,6 +109,7 @@
                         <input type="text" id="proto-monetization" placeholder="订阅服务、素材市场、品牌合作..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
                 </div>
+                <!-- 提交按钮 -->
                 <div class="md:col-span-2 flex justify-end">
                     <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         保存原型
@@ -114,8 +120,10 @@
 
         <!-- 原型展示区域 -->
         <div id="prototypes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- JavaScript将在这里动态插入原型卡片 -->
             <div id="loader-container"><div class="loader"></div></div>
         </div>
+
     </div>
 
     <!-- 删除确认模态框 -->
@@ -137,7 +145,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// Firebase配置 (替换成你自己的)
+        // Firebase配置 (由运行环境自动提供，部署时需替换)
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -176,12 +184,11 @@ const app = initializeApp(firebaseConfig);
         // 监听认证状态变化
         onAuthStateChanged(auth, user => {
             if (user) {
-                // 用户已登录
-                authStatus.textContent = `已连接 | 用户ID: ${user.uid}`;
-                prototypesCollectionRef = collection(db, 'artifacts', appId, 'users', user.uid, 'prototypes');
+                authStatus.textContent = `已连接 | 用户ID: ${user.uid.substring(0, 8)}...`;
+                // 使用公共路径来存储数据，以便所有人都能看到
+                prototypesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'prototypes');
                 listenForPrototypes();
             } else {
-                // 用户未登录
                 authStatus.textContent = '未连接，正在尝试匿名登录...';
             }
         });
@@ -202,11 +209,11 @@ const app = initializeApp(firebaseConfig);
 
         // 监听原型数据
         const listenForPrototypes = () => {
-            const q = query(prototypesCollectionRef, orderBy('createdAt', 'desc')); // 按创建时间降序排序
+            const q = query(prototypesCollectionRef, orderBy('createdAt', 'desc'));
 
             onSnapshot(q, (snapshot) => {
-                loader.style.display = 'none'; // 隐藏加载动画
-                prototypesList.innerHTML = ''; // 清空现有列表
+                loader.style.display = 'none';
+                prototypesList.innerHTML = '';
                 if (snapshot.empty) {
                     prototypesList.innerHTML = `<p class="col-span-full text-center text-gray-500">还没有原型，快添加一个吧！</p>`;
                 }
@@ -215,7 +222,7 @@ const app = initializeApp(firebaseConfig);
                     const card = createPrototypeCard(proto, doc.id);
                     prototypesList.appendChild(card);
                 });
-                lucide.createIcons(); // 重新渲染所有图标
+                lucide.createIcons();
             }, (error) => {
                 console.error("Error fetching prototypes:", error);
                 prototypesList.innerHTML = `<p class="col-span-full text-center text-red-500">加载数据失败，请检查控制台信息。</p>`;
@@ -287,7 +294,7 @@ const app = initializeApp(firebaseConfig);
                 highlight: document.getElementById('proto-highlight').value,
                 logic: document.getElementById('proto-logic').value,
                 monetization: document.getElementById('proto-monetization').value,
-                createdAt: serverTimestamp() // 添加服务器时间戳，用于排序
+                createdAt: serverTimestamp()
             };
             
             try {
@@ -311,7 +318,7 @@ const app = initializeApp(firebaseConfig);
         confirmDeleteBtn.addEventListener('click', async () => {
             if (prototypeToDeleteId) {
                 try {
-                    await deleteDoc(doc(db, prototypesCollectionRef.path, prototypeToDeleteId));
+                    await deleteDoc(doc(prototypesCollectionRef, prototypeToDeleteId));
                 } catch (error) {
                     console.error("Error deleting document: ", error);
                     alert("删除失败！");
