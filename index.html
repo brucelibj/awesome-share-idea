@@ -3,245 +3,466 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品原型合集</title>
-    <!-- 引入Tailwind CSS，用于快速构建现代化界面 -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入Lucide Icons图标库 -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>竖线路径动画 (Firebase 同步)</title>
     <style>
-        /* 使用更适合阅读的Inter字体 */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        /* --- 基础和布局样式 --- */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; /* 使用柔和的浅灰色背景，突出卡片 */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 1rem;
+            box-sizing: border-box;
         }
-        /* 卡片悬浮时的动效，增加交互感 */
-        .prototype-card:hover {
-            transform: translateY(-5px);
+        .main-container {
+            width: 100%;
+            max-width: 28rem; /* 448px */
+            padding: 1.5rem; /* 24px */
+            background-color: #ffffff;
+            border-radius: 1rem; /* 16px */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .main-container > * + * {
+            margin-top: 1.5rem;
+        }
+        h1 {
+            font-size: 1.5rem;
+            line-height: 2rem;
+            font-weight: 700;
+            text-align: center;
+            color: #1f2937;
+        }
+        .animation-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #f9fafb;
+            border-radius: 0.75rem;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 0.5s ease-in-out;
+        }
+        #line-path {
+            stroke: #ffffff;
+            stroke-width: 3;
+            fill: none;
+            filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.7));
+        }
+        #ball {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        .controls-container {
+            border: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background-color: #ffffff;
+        }
+        .controls-container > * + * {
+             margin-top: 1.25rem;
+        }
+        .control-item > div:first-child {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        label {
+            font-weight: 500;
+            color: #374151;
+        }
+        .value-display {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #2563eb;
+            background-color: #dbeafe;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e5e7eb;
+            outline: none;
+            position: relative;
+            z-index: 1;
+        }
+        input[type="range"]:disabled {
+            background: #f3f4f6;
+        }
+        input[type="range"]:disabled::-webkit-slider-thumb {
+            background: #9ca3af;
+        }
+        input[type="range"]:disabled::-moz-range-thumb {
+            background: #9ca3af;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        .slider-ticks-container {
+            position: relative;
+            height: 20px;
+            margin-top: -8px;
+            margin-bottom: 8px;
+        }
+        .slider-tick-mark {
+            position: absolute;
+            bottom: 10px;
+            width: 2px;
+            background-color: #d1d5db;
+            transform: translateX(-50%);
+        }
+        .slider-tick-mark.minor { height: 4px; }
+        .slider-tick-mark.major { height: 8px; background-color: #4b5563; }
+        .slider-tick-label {
+            position: absolute;
+            bottom: -5px;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #4b5563;
+        }
+        .upload-button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+        .upload-button:hover {
+            background-color: #2563eb;
+        }
+        #auth-status {
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 1rem;
+            word-break: break-all;
+            line-height: 1.5;
         }
     </style>
 </head>
-<body class="p-4 sm:p-6 md:p-8">
+<body>
 
-    <div class="max-w-7xl mx-auto">
-        <!-- 页面主标题 -->
-        <header class="text-center mb-10">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">产品原型创意库</h1>
-            <p class="mt-2 text-md text-gray-500">超过200个创新想法的起点</p>
-        </header>
+    <div class="main-container">
+        <h1>路径动画控制器</h1>
 
-        <!-- 原型卡片网格布局容器 -->
-        <!-- 响应式设计：手机上1列，平板2列，桌面3列 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div id="animation-container" class="animation-container">
+            <svg width="350" height="350" viewBox="0 0 350 350">
+                <line id="line-path" x1="175" y1="50" x2="175" y2="300" />
+            </svg>
+            <div id="ball"></div>
+        </div>
 
-            <!-- 卡片 1: “安心拍” -->
-            <div class="prototype-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out border border-gray-200">
-                <!-- 卡片头部 -->
-                <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold bg-white/20 text-white py-1 px-2 rounded-full">原型 1.0 版本 A</span>
-                        <i data-lucide="shield-check" class="w-6 h-6 opacity-80"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold mt-3">“安心拍”</h2>
-                    <p class="text-sm opacity-90 mt-1">AI场景隐私保护与智能创作引导器</p>
+        <div class="controls-container">
+            <div class="control-item">
+                 <div>
+                    <label>背景图片</label>
                 </div>
-
-                <!-- 卡片主体内容 -->
-                <div class="p-6 space-y-6">
-                    <!-- 核心功能 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="zap" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            核心功能
-                        </h3>
-                        <ul class="list-none space-y-2 text-gray-600 text-sm pl-1">
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">AI隐私滤镜/模糊：</strong>实时保护人脸、车牌等敏感信息。</span></li>
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">“场景助手”模式：</strong>AI实时提供拍摄角度、运镜、构图建议。</span></li>
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">情绪识别与引导：</strong>检测紧张情绪并提供放松建议。</span></li>
-                        </ul>
-                    </div>
-
-                    <!-- 分隔线 -->
-                    <hr class="border-gray-200">
-
-                    <!-- 目标用户 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="users" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            目标用户
-                        </h3>
-                        <p class="text-gray-600 text-sm leading-relaxed">初级视频创作者、注重隐私的普通用户（如宝妈、学生、探店博主等）。</p>
-                    </div>
-                    
-                    <!-- 差异化亮点 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            差异化亮点
-                        </h3>
-                        <p class="text-gray-600 text-sm bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-500">专注拍摄过程中的“心理安全感”与“专业度提升”，从源头解决痛点。</p>
-                    </div>
-
-                    <!-- 商业逻辑与变现 -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                        <div>
-                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2">
-                                <i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-indigo-500"></i>
-                                初步商业逻辑
-                            </h4>
-                            <p class="text-xs text-gray-500">提升体验，降低创作门槛，激励用户持续产出。</p>
-                        </div>
-                        <div>
-                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2">
-                                <i data-lucide="dollar-sign" class="w-4 h-4 mr-1.5 text-indigo-500"></i>
-                                潜在变现模式
-                            </h4>
-                            <p class="text-xs text-gray-500">订阅服务、素材/模板市场、品牌合作。</p>
-                        </div>
-                    </div>
+                <div>
+                    <input type="file" id="bg-image-upload" accept="image/*" style="display: none;">
+                    <label for="bg-image-upload" class="upload-button">选择本地图片</label>
                 </div>
             </div>
 
-                    <!-- 卡片 1: “安心拍” -->
-            <div class="prototype-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out border border-gray-200">
-                <!-- 卡片头部 -->
-                <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold bg-white/20 text-white py-1 px-2 rounded-full">原型 1.0 版本 A</span>
-                        <i data-lucide="shield-check" class="w-6 h-6 opacity-80"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold mt-3">“安心拍”</h2>
-                    <p class="text-sm opacity-90 mt-1">AI场景隐私保护与智能创作引导器</p>
+            <div class="control-item">
+                <div>
+                    <label for="durationDown">向下时间 (绿色)</label>
+                    <span id="duration-down-value" class="value-display">3s</span>
                 </div>
-
-                <!-- 卡片主体内容 -->
-                <div class="p-6 space-y-6">
-                    <!-- 核心功能 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="zap" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            核心功能
-                        </h3>
-                        <ul class="list-none space-y-2 text-gray-600 text-sm pl-1">
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">AI隐私滤镜/模糊：</strong>实时保护人脸、车牌等敏感信息。</span></li>
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">“场景助手”模式：</strong>AI实时提供拍摄角度、运镜、构图建议。</span></li>
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">情绪识别与引导：</strong>检测紧张情绪并提供放松建议。</span></li>
-                        </ul>
-                    </div>
-
-                    <!-- 分隔线 -->
-                    <hr class="border-gray-200">
-
-                    <!-- 目标用户 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="users" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            目标用户
-                        </h3>
-                        <p class="text-gray-600 text-sm leading-relaxed">初级视频创作者、注重隐私的普通用户（如宝妈、学生、探店博主等）。</p>
-                    </div>
-                    
-                    <!-- 差异化亮点 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            差异化亮点
-                        </h3>
-                        <p class="text-gray-600 text-sm bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-500">专注拍摄过程中的“心理安全感”与“专业度提升”，从源头解决痛点。</p>
-                    </div>
-
-                    <!-- 商业逻辑与变现 -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                        <div>
-                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2">
-                                <i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-indigo-500"></i>
-                                初步商业逻辑
-                            </h4>
-                            <p class="text-xs text-gray-500">提升体验，降低创作门槛，激励用户持续产出。</p>
-                        </div>
-                        <div>
-                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2">
-                                <i data-lucide="dollar-sign" class="w-4 h-4 mr-1.5 text-indigo-500"></i>
-                                潜在变现模式
-                            </h4>
-                            <p class="text-xs text-gray-500">订阅服务、素材/模板市场、品牌合作。</p>
-                        </div>
-                    </div>
+                <div class="relative">
+                    <input type="range" id="durationDown" min="1000" max="15000" value="3000" step="1000">
+                    <div id="slider-ticks-down" class="slider-ticks-container"></div>
                 </div>
             </div>
-
-                      <!-- 卡片 1: “安心拍” -->
-            <div class="prototype-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out border border-gray-200">
-                <!-- 卡片头部 -->
-                <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold bg-white/20 text-white py-1 px-2 rounded-full">原型 1.0 版本 A</span>
-                        <i data-lucide="shield-check" class="w-6 h-6 opacity-80"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold mt-3">“安心拍”</h2>
-                    <p class="text-sm opacity-90 mt-1">AI场景隐私保护与智能创作引导器</p>
+            <div class="control-item">
+                <div>
+                    <label for="durationUp">向上时间 (红色)</label>
+                    <span id="duration-up-value" class="value-display">3s</span>
                 </div>
-
-                <!-- 卡片主体内容 -->
-                <div class="p-6 space-y-6">
-                    <!-- 核心功能 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="zap" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            核心功能
-                        </h3>
-                        <ul class="list-none space-y-2 text-gray-600 text-sm pl-1">
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">AI隐私滤镜/模糊：</strong>实时保护人脸、车牌等敏感信息。</span></li>
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">“场景助手”模式：</strong>AI实时提供拍摄角度、运镜、构图建议。</span></li>
-                            <li class="flex items-start"><span class="font-bold mr-2 text-indigo-500">&#8226;</span><span><strong class="font-medium text-gray-700">情绪识别与引导：</strong>检测紧张情绪并提供放松建议。</span></li>
-                        </ul>
-                    </div>
-
-                    <!-- 分隔线 -->
-                    <hr class="border-gray-200">
-
-                    <!-- 目标用户 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="users" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            目标用户
-                        </h3>
-                        <p class="text-gray-600 text-sm leading-relaxed">初级视频创作者、注重隐私的普通用户（如宝妈、学生、探店博主等）。</p>
-                    </div>
-                    
-                    <!-- 差异化亮点 -->
-                    <div>
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                            <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-indigo-500"></i>
-                            差异化亮点
-                        </h3>
-                        <p class="text-gray-600 text-sm bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-500">专注拍摄过程中的“心理安全感”与“专业度提升”，从源头解决痛点。</p>
-                    </div>
-
-                    <!-- 商业逻辑与变现 -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                        <div>
-                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2">
-                                <i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-indigo-500"></i>
-                                初步商业逻辑
-                            </h4>
-                            <p class="text-xs text-gray-500">提升体验，降低创作门槛，激励用户持续产出。</p>
-                        </div>
-                        <div>
-                            <h4 class="flex items-center text-md font-semibold text-gray-700 mb-2">
-                                <i data-lucide="dollar-sign" class="w-4 h-4 mr-1.5 text-indigo-500"></i>
-                                潜在变现模式
-                            </h4>
-                            <p class="text-xs text-gray-500">订阅服务、素材/模板市场、品牌合作。</p>
-                        </div>
-                    </div>
+                 <div class="relative">
+                    <input type="range" id="durationUp" min="1000" max="15000" value="3000" step="1000">
+                    <div id="slider-ticks-up" class="slider-ticks-container"></div>
                 </div>
             </div>
+        </div>
+        
+        <p id="status-check" style="text-align: center; font-size: 12px; color: #9ca3af; height: 1em;"></p>
+        <div id="auth-status">正在连接...</div>
+    </div>
 
-    <script>
-        // 脚本用于在页面加载后渲染所有Lucide图标
-        lucide.createIcons();
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // 导入 Firebase 模块
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- DOM 元素获取 ---
+        const ball = document.getElementById('ball');
+        const durationSliderDown = document.getElementById('durationDown');
+        const durationSliderUp = document.getElementById('durationUp');
+        const durationValueDown = document.getElementById('duration-down-value');
+        const durationValueUp = document.getElementById('duration-up-value');
+        const statusCheck = document.getElementById('status-check');
+        const animationContainer = document.getElementById('animation-container');
+        const bgImageUpload = document.getElementById('bg-image-upload');
+        const bgImageUploadLabel = document.querySelector('label[for="bg-image-upload"]');
+        const authStatusDiv = document.getElementById('auth-status');
+
+        try {
+            // --- Firebase 初始化 ---
+            // 已使用您提供的真实配置信息
+            const firebaseConfig = {
+              apiKey: "AIzaSyDoBqHdy2mtrV59l440R5_cy6hNhIHh69E",
+              authDomain: "awesome-share-idea.firebaseapp.com",
+              projectId: "awesome-share-idea",
+              storageBucket: "awesome-share-idea.appspot.com",
+              messagingSenderId: "948762728944",
+              appId: "1:948762728944:web:75ee9632d3991606066535"
+            };
+            
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+
+            let userId;
+            let settingsDocRef;
+            let isUpdatingFromFirestore = false;
+
+            // --- 动画核心变量 ---
+            const topPoint = { x: 175, y: 50 };
+            const bottomPoint = { x: 175, y: 300 };
+            let durationDown = parseInt(durationSliderDown.value, 10);
+            let durationUp = parseInt(durationSliderUp.value, 10);
+            let lastTimestamp = 0;
+            let totalElapsedTime = 0;
+            
+            // --- 函数定义 ---
+            function lerp(start, end, progress) {
+                const x = start.x + (end.x - start.x) * progress;
+                const y = start.y + (end.y - start.y) * progress;
+                return { x, y };
+            }
+
+            function animate(timestamp) {
+                if (!lastTimestamp) lastTimestamp = timestamp;
+                const deltaTime = timestamp - lastTimestamp;
+                totalElapsedTime += deltaTime;
+                lastTimestamp = timestamp;
+
+                const totalDuration = durationDown + durationUp;
+                if (totalDuration <= 0) {
+                    requestAnimationFrame(animate);
+                    return;
+                }
+                const timeInLoop = totalElapsedTime % totalDuration;
+
+                let currentPos;
+                if (timeInLoop < durationDown) {
+                    currentPos = lerp(topPoint, bottomPoint, timeInLoop / durationDown);
+                    ball.style.backgroundColor = '#10b981';
+                } else {
+                    currentPos = lerp(bottomPoint, topPoint, (timeInLoop - durationDown) / durationUp);
+                    ball.style.backgroundColor = '#ef4444';
+                }
+
+                ball.style.left = `${currentPos.x}px`;
+                ball.style.top = `${currentPos.y}px`;
+
+                requestAnimationFrame(animate);
+            }
+
+            function updateSliderValue(slider, valueEl) {
+                const seconds = slider.value / 1000;
+                valueEl.textContent = `${seconds}s`;
+            }
+            
+            function createSliderTicks(containerId, min, max, majorValues) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const range = max - min;
+                if (range <= 0) return;
+                container.innerHTML = '';
+                for (let i = min; i <= max; i += 1000) {
+                    const isMajor = majorValues.includes(i / 1000);
+                    const percent = ((i - min) / range) * 100;
+                    const mark = document.createElement('div');
+                    mark.className = `slider-tick-mark ${isMajor ? 'major' : 'minor'}`;
+                    mark.style.left = `${percent}%`;
+                    container.appendChild(mark);
+                    if (isMajor) {
+                        const label = document.createElement('div');
+                        label.className = 'slider-tick-label';
+                        label.textContent = String(i / 1000);
+                        label.style.left = `${percent}%`;
+                        container.appendChild(label);
+                    }
+                }
+            }
+            
+            async function saveSettings() {
+                if (!settingsDocRef || isUpdatingFromFirestore) return;
+                const settings = {
+                    durationDown: parseInt(durationSliderDown.value, 10),
+                    durationUp: parseInt(durationSliderUp.value, 10),
+                };
+                try {
+                    await setDoc(settingsDocRef, settings);
+                } catch (error) {
+                    console.error("保存设置失败: ", error);
+                }
+            }
+
+            function updateUIFromSettings(settings) {
+                isUpdatingFromFirestore = true;
+                if (settings.durationDown) {
+                    durationSliderDown.value = settings.durationDown;
+                    durationDown = settings.durationDown;
+                    updateSliderValue(durationSliderDown, durationValueDown);
+                }
+                if (settings.durationUp) {
+                    durationSliderUp.value = settings.durationUp;
+                    durationUp = settings.durationUp;
+                    updateSliderValue(durationSliderUp, durationValueUp);
+                }
+                setTimeout(() => { isUpdatingFromFirestore = false; }, 100);
+            }
+            
+            // --- 事件监听器 ---
+            durationSliderDown.addEventListener('input', () => {
+                durationDown = parseInt(durationSliderDown.value, 10);
+                updateSliderValue(durationSliderDown, durationValueDown);
+                saveSettings();
+            });
+
+            durationSliderUp.addEventListener('input', () => {
+                durationUp = parseInt(durationSliderUp.value, 10);
+                updateSliderValue(durationSliderUp, durationValueUp);
+                saveSettings();
+            });
+
+            bgImageUpload.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        animationContainer.style.backgroundImage = `url('${e.target.result}')`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // --- Firebase 认证和数据同步 ---
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    authStatusDiv.textContent = `用户 ID: ${userId}`;
+                    settingsDocRef = doc(db, `users/${userId}/animationSettings`, 'settings');
+                    
+                    // 修改：为 onSnapshot 添加错误处理回调
+                    onSnapshot(settingsDocRef, 
+                        (docSnap) => { // 成功回调
+                            if (docSnap.exists()) {
+                                const settings = docSnap.data();
+                                updateUIFromSettings(settings);
+                            } else {
+                                console.log("未找到设置文档，使用默认值并创建。");
+                                saveSettings();
+                            }
+                        }, 
+                        (error) => { // 错误回调
+                            console.error("Firestore snapshot listener 错误:", error);
+                            if (error.code === 'permission-denied') {
+                                authStatusDiv.innerHTML = `
+                                    <strong style="color: red;">错误：权限不足 (Permission Denied)</strong><br>
+                                    无法从数据库加载或保存设置。<br>
+                                    这很可能是因为您 Firebase 项目的<strong>安全规则</strong>已过期或不正确。<br>
+                                    请访问您的 Firebase 控制台更新 Firestore 规则。
+                                `;
+                                // 禁用控件，因为无法同步
+                                durationSliderDown.disabled = true;
+                                durationSliderUp.disabled = true;
+                                bgImageUpload.disabled = true;
+                                bgImageUploadLabel.style.backgroundColor = '#9ca3af';
+                                bgImageUploadLabel.style.cursor = 'not-allowed';
+                            }
+                        }
+                    );
+
+                } else {
+                    authStatusDiv.textContent = '未认证';
+                }
+            });
+
+            async function signIn() {
+                try {
+                    await signInAnonymously(auth);
+                } catch (error) {
+                    console.error("匿名登录失败:", error);
+                    authStatusDiv.textContent = '认证失败: ' + error.message;
+                }
+            }
+            
+            // --- 初始化 ---
+            updateSliderValue(durationSliderDown, durationValueDown);
+            updateSliderValue(durationSliderUp, durationValueUp);
+            const majorTicks = [1, 5, 10, 15];
+            createSliderTicks('slider-ticks-down', 1000, 15000, majorTicks);
+            createSliderTicks('slider-ticks-up', 1000, 15000, majorTicks);
+            
+            await signIn();
+            requestAnimationFrame(animate);
+
+            statusCheck.textContent = '动画已成功运行。';
+            statusCheck.style.color = 'green';
+
+        } catch (e) {
+            // 这个 catch 块现在只处理意外错误
+            const statusCheck = document.getElementById('status-check');
+            if (statusCheck) {
+                statusCheck.textContent = '错误: ' + e.message;
+                statusCheck.style.color = 'red';
+            }
+            console.error("加载失败:", e);
+        }
     </script>
+
 </body>
 </html>
